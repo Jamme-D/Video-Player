@@ -117,34 +117,41 @@ function changeSpeed() {
 
 /* View in fullscreen */
 function openFullscreen(elem) {
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { /* Safari */
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE11 */
-      elem.msRequestFullscreen();
-    }
-    video.classList.add('video-fullscreen');
-  }
+if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+ } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+} else if (elem.msRequestFullscreen) { /* IE11 */
+  elem.msRequestFullscreen();
+}
+video.classList.add('video-fullscreen');
+}
   
   /* Close fullscreen */
-  function closeFullscreen() {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) { /* Safari */
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { /* IE11 */
-      document.msExitFullscreen();
-    }
-    video.classList.remove('video-fullscreen');
-  }
+function closeFullscreen() {
+if (document.fullscreenElement) {
+    document.exitFullscreen();
+} else if (document.webkitExitFullscreen) { /* Safari */
+    document.webkitExitFullscreen();
+} else if (document.msExitFullscreen) { /* IE11 */
+    document.msExitFullscreen();
+}
+video.classList.remove('video-fullscreen');
+}
 
-  let fullscreen = false;
+let fullscreen = false;
 
 //   Toggle Fullscreen
 function toggleFullscreen() {
     !fullscreen ? openFullscreen(player) : closeFullscreen();
     fullscreen = !fullscreen;
+}
+
+// To handle an unexpected event for closing fullscreen
+function exitHandler() {
+    if (!document.webkitIsFullScreen && !document.msFullscreenElement && fullscreen) {
+        toggleFullscreen();
+    }
 }
 
 // Event Listeners
@@ -157,3 +164,11 @@ volumeRange.addEventListener('click', changeVolume);
 volumeIcon.addEventListener('click', toggleMute);
 speed.addEventListener('change', changeSpeed);
 fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+// This event listener adds an exitHandler to format page incase an unexpected event occurs, exiting fullscreen
+if (document.addEventListener) {
+    document.addEventListener('webkitfullscreenchange', exitHandler, false);
+    document.addEventListener('mozfullscreenchange', exitHandler, false);
+    document.addEventListener('fullscreenchange', exitHandler, false);
+    document.addEventListener('MSFullscreenChange', exitHandler, false);
+}
